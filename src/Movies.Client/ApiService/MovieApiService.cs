@@ -1,13 +1,41 @@
 ﻿using Movies.Client.Models;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Movies.Client.ApiService
 {
     public class MovieApiService : IMovieApiService
     {
+        private readonly IHttpClientFactory _httpClientFactory;
+
+        public MovieApiService(IHttpClientFactory httpClientFactory)
+        {
+            _httpClientFactory = httpClientFactory ?? throw new ArgumentNullException(nameof(httpClientFactory));
+        }
+
+        public async Task<IEnumerable<Movie>> GetMovies()
+        {
+            var client = _httpClientFactory.CreateClient("MovieAPIClient");
+
+            var request = new HttpRequestMessage(
+                HttpMethod.Get,
+                "/api/v1/movies/");
+
+            var response = await client.SendAsync(
+                request, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
+
+            response.EnsureSuccessStatusCode();
+            var content = await response.Content.ReadAsStringAsync();
+            var movies = JsonConvert.DeserializeObject<List<Movie>>(content);
+            return movies;
+        }
+
+
         public async Task<Movie> CreateMovie(Movie movie)
         {
             throw new NotImplementedException();
@@ -22,22 +50,6 @@ namespace Movies.Client.ApiService
         public Task<Movie> GetMovie(Guid id)
         {
             throw new NotImplementedException();
-        }
-
-        public async Task<IEnumerable<Movie>> GetMovies()
-        {
-            var movies = new List<Movie>();
-            movies.Add(new Movie
-            {
-                Id = Guid.NewGuid(),
-                Genre = "Drama",
-                Title = "The Shawshank Redemption",
-                Rating = "9.3",
-                ImageUrl = "images/src",
-                ReleaseDate = new DateTime(1994, 5, 5),
-                OwnerId = "alice"
-            });
-            return await Task.FromResult(movies);
         }
 
         public Task<Movie> UpdateMovie(Movie movie)

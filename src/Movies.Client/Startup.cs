@@ -1,4 +1,5 @@
 ﻿using IdentityModel;
+using IdentityModel.Client;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
@@ -8,7 +9,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.Net.Http.Headers;
 using Movies.Client.ApiService;
+using Movies.Client.Handlers;
+using System;
 
 namespace Movies.Client
 {
@@ -24,16 +28,35 @@ namespace Movies.Client
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllersWithViews();
+            services.AddControllersWithViews()
+                 .AddJsonOptions(opts => opts.JsonSerializerOptions.PropertyNamingPolicy = null);
 
+            services.AddTransient<BearerTokenHandler>();
 
             // create an HttpClient used for accessing the API
-            services.AddHttpClient("APIClient", client =>
+            services.AddHttpClient("MovieAPIClient", client =>
             {
-                client.BaseAddress = new Uri("https://localhost:44366/");
+                client.BaseAddress = new Uri("https://localhost:5001/");
                 client.DefaultRequestHeaders.Clear();
                 client.DefaultRequestHeaders.Add(HeaderNames.Accept, "application/json");
             }).AddHttpMessageHandler<BearerTokenHandler>();
+
+            services.AddHttpClient("IDPClient", client =>
+            {
+                client.BaseAddress = new Uri("https://localhost:5005/");
+                client.DefaultRequestHeaders.Clear();
+                client.DefaultRequestHeaders.Add(HeaderNames.Accept, "application/json");
+            });
+
+            services.AddHttpContextAccessor();
+
+            services.AddSingleton(new ClientCredentialsTokenRequest
+            {
+                Address = "https://localhost:5005/connect/token",
+                ClientId = "movieClient",
+                ClientSecret = "secret",
+                Scope = "movieAPI"
+            });
 
             services.AddScoped<IMovieApiService, MovieApiService>();
             services.AddAuthentication(opt =>
