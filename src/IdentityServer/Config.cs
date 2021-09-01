@@ -74,26 +74,7 @@ namespace IdentityServer
               new IdentityResources.Profile(),
               new IdentityResources.Address(),
               new IdentityResources.Email(),
-              new IdentityResource(
-                    "roles",
-                    "Your role(s)",
-                    new List<string>() { "role" })
+              new IdentityResource("roles","Your role(s)", new List<string>() { "role" })
           };
-
-        public static List<TestUser> TestUsers =>
-            new List<TestUser>
-            {
-                new TestUser
-                {
-                    SubjectId = "5BE86359-073C-434B-AD2D-A3932222DABE",
-                    Username = "Quentin",
-                    Password = "Helios",
-                    Claims = new List<Claim>
-                    {
-                        new Claim(JwtClaimTypes.GivenName, "Quentin"),
-                        new Claim(JwtClaimTypes.FamilyName, "Couissinier")
-                    }
-                }
-            };
     }
 }

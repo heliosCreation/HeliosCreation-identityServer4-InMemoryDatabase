@@ -37,6 +37,7 @@ namespace Movies.Client.Extensions.ServiceExtensions
                 //opt.CallbackPath = new PathString("");
 
                 opt.Scope.Add("address");
+                opt.Scope.Add("email");
                 opt.Scope.Add("roles");
                 opt.Scope.Add("movieAPI");
 
@@ -48,6 +49,8 @@ namespace Movies.Client.Extensions.ServiceExtensions
                 //Some claims might also not be wanted. With this method, we remove them from the claim Identity. Thus, making the cookie lighter.
                 opt.ClaimActions.DeleteClaims("sid", "idp", "s_hash", "auth_time");
                 opt.ClaimActions.MapUniqueJsonKey("role", "role");
+
+                //Token should posesses those values
                 opt.TokenValidationParameters = new TokenValidationParameters
                 {
                     NameClaimType = JwtClaimTypes.GivenName,
