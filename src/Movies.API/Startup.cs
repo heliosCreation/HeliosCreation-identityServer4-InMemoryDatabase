@@ -50,6 +50,10 @@ namespace Movies.API
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+
+                app.UseCors(builder =>
+           builder.AllowAnyHeader().AllowAnyOrigin().AllowAnyMethod());
+
                 app.UseSwagger();
                 app.UseSwaggerUI(opt =>
                 {
@@ -57,6 +61,7 @@ namespace Movies.API
                     opt.RoutePrefix = string.Empty;
                 });
             }
+
 
             app.UseHttpsRedirection();
 

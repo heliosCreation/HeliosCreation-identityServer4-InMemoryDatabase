@@ -1,9 +1,10 @@
 ﻿using Movies.Client.Models;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Net.Http.Json;
+using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 
@@ -12,10 +13,12 @@ namespace Movies.Client.ApiService
     public class MovieApiService : IMovieApiService
     {
         private readonly IHttpClientFactory _httpClientFactory;
+        private readonly JsonSerializerOptions _options;
 
         public MovieApiService(IHttpClientFactory httpClientFactory)
         {
             _httpClientFactory = httpClientFactory ?? throw new ArgumentNullException(nameof(httpClientFactory));
+            _options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
         }
 
         public async Task<IEnumerable<Movie>> GetMovies()
@@ -30,31 +33,70 @@ namespace Movies.Client.ApiService
                 request, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
 
             response.EnsureSuccessStatusCode();
-            var content = await response.Content.ReadAsStringAsync();
-            var movies = JsonConvert.DeserializeObject<List<Movie>>(content);
+            var stream = await response.Content.ReadAsStreamAsync();
+            var movies = await JsonSerializer.DeserializeAsync<List<Movie>>(stream, _options);
             return movies;
         }
 
-
-        public async Task<Movie> CreateMovie(Movie movie)
+        public async Task<Movie> GetMovie(Guid? id)
         {
-            throw new NotImplementedException();
+            var client = _httpClientFactory.CreateClient("MovieAPIClient");
 
+            var request = new HttpRequestMessage(
+                HttpMethod.Get,
+                $"/api/v1/movies/{id}");
+
+            var response = await client.SendAsync(
+                request, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
+
+            response.EnsureSuccessStatusCode();
+            var stream = await response.Content.ReadAsStreamAsync();
+            var movie = await JsonSerializer.DeserializeAsync<Movie>(stream, _options);
+            return movie;
         }
 
-        public Task DeleteMovie(Guid id)
+        public async Task CreateMovie(Movie movie)
         {
-            throw new NotImplementedException();
+            var client = _httpClientFactory.CreateClient("MovieAPIClient");
+
+            var request = new HttpRequestMessage(HttpMethod.Post, "/api/v1/movies")
+            {
+                Content = JsonContent.Create(movie)
+            };
+            
+            var response = await client.SendAsync(
+                request, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
+
+            response.EnsureSuccessStatusCode();
         }
 
-        public Task<Movie> GetMovie(Guid id)
+        public async Task UpdateMovie(Movie movie)
         {
-            throw new NotImplementedException();
+            var client = _httpClientFactory.CreateClient("MovieAPIClient");
+
+            var request = new HttpRequestMessage(HttpMethod.Put, $"/api/v1/movies/{movie.Id}")
+            {
+                Content = JsonContent.Create(movie)
+            };
+
+            var response = await client.SendAsync(
+                request, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
+
+            response.EnsureSuccessStatusCode();
         }
 
-        public Task<Movie> UpdateMovie(Movie movie)
+        public async Task DeleteMovie(Guid id)
         {
-            throw new NotImplementedException();
+            var client = _httpClientFactory.CreateClient("MovieAPIClient");
+
+            var request = new HttpRequestMessage(
+                HttpMethod.Delete,
+                $"/api/v1/movies/{id}");
+
+            var response = await client.SendAsync(
+                request, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
+
+            response.EnsureSuccessStatusCode();
         }
     }
 }
