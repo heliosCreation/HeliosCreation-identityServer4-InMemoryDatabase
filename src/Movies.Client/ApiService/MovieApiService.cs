@@ -61,7 +61,7 @@ namespace Movies.Client.ApiService
 
             var request = new HttpRequestMessage(
                 HttpMethod.Get,
-                "/api/v1/movies/");
+                "/movies");
 
             var response = await client.SendAsync(
                 request, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
@@ -76,9 +76,7 @@ namespace Movies.Client.ApiService
         {
             var client = _httpClientFactory.CreateClient("MovieAPIClient");
 
-            var request = new HttpRequestMessage(
-                HttpMethod.Get,
-                $"/api/v1/movies/{id}");
+            var request = new HttpRequestMessage (HttpMethod.Get, $"/movies/{id}");
 
             var response = await client.SendAsync(
                 request, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
@@ -93,7 +91,7 @@ namespace Movies.Client.ApiService
         {
             var client = _httpClientFactory.CreateClient("MovieAPIClient");
 
-            var request = new HttpRequestMessage(HttpMethod.Post, "/api/v1/movies")
+            var request = new HttpRequestMessage(HttpMethod.Post, "/movies")
             {
                 Content = JsonContent.Create(movie)
             };
@@ -108,7 +106,7 @@ namespace Movies.Client.ApiService
         {
             var client = _httpClientFactory.CreateClient("MovieAPIClient");
 
-            var request = new HttpRequestMessage(HttpMethod.Put, $"/api/v1/movies/{movie.Id}")
+            var request = new HttpRequestMessage(HttpMethod.Put, $"/movies/{movie.Id}")
             {
                 Content = JsonContent.Create(movie)
             };
@@ -123,9 +121,7 @@ namespace Movies.Client.ApiService
         {
             var client = _httpClientFactory.CreateClient("MovieAPIClient");
 
-            var request = new HttpRequestMessage(
-                HttpMethod.Delete,
-                $"/api/v1/movies/{id}");
+            var request = new HttpRequestMessage(HttpMethod.Delete, $"movies/{id}");
 
             var response = await client.SendAsync(
                 request, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);

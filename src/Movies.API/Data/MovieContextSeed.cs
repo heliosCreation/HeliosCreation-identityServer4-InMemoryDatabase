@@ -31,7 +31,7 @@ namespace Movies.API.Data
                         Rating = "9.3",
                         ImageUrl = "images/src",
                         ReleaseDate = new DateTime(1994, 5, 5),
-                        OwnerId = "alice"
+                        OwnerId = "5BE86359-073C-434B-AD2D-A3932222DABE"
                     },
                     new Movie
                     {
@@ -41,7 +41,7 @@ namespace Movies.API.Data
                         Rating = "9.2",
                         ImageUrl = "images/src",
                         ReleaseDate = new DateTime(1972, 5, 5),
-                        OwnerId = "alice"
+                        OwnerId = "5BE86359-073C-434B-AD2D-A3932222DABE"
                     },
                     new Movie
                     {
@@ -51,7 +51,7 @@ namespace Movies.API.Data
                         Rating = "9.1",
                         ImageUrl = "images/src",
                         ReleaseDate = new DateTime(2008, 5, 5),
-                        OwnerId = "bob"
+                        OwnerId = "5BE86359-073C-434B-AD2D-A3932222DABE"
                     },
                     new Movie
                     {
@@ -61,7 +61,7 @@ namespace Movies.API.Data
                         Rating = "8.9",
                         ImageUrl = "images/src",
                         ReleaseDate = new DateTime(1957, 5, 5),
-                        OwnerId = "bob"
+                        OwnerId = "5BE86359-073C-434B-AD2D-A3932222DABE"
                     },
                     new Movie
                     {
@@ -71,7 +71,7 @@ namespace Movies.API.Data
                         Rating = "8.9",
                         ImageUrl = "images/src",
                         ReleaseDate = new DateTime(1993, 5, 5),
-                        OwnerId = "alice"
+                        OwnerId = "88421113"
                     },
                     new Movie
                     {
@@ -81,7 +81,7 @@ namespace Movies.API.Data
                         Rating = "8.9",
                         ImageUrl = "images/src",
                         ReleaseDate = new DateTime(1994, 5, 5),
-                        OwnerId = "alice"
+                        OwnerId = "88421113"
                     },
                     new Movie
                     {
@@ -91,7 +91,7 @@ namespace Movies.API.Data
                         Rating = "8.8",
                         ImageUrl = "images/src",
                         ReleaseDate = new DateTime(1999, 5, 5),
-                        OwnerId = "bob"
+                        OwnerId = "88421113"
                     },
                     new Movie
                     {
@@ -101,7 +101,7 @@ namespace Movies.API.Data
                         Rating = "8.8",
                         ImageUrl = "images/src",
                         ReleaseDate = new DateTime(1994, 5, 5),
-                        OwnerId = "bob"
+                        OwnerId = "88421113"
                     }
             };
         }

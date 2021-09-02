@@ -13,7 +13,7 @@ namespace Movies.Client.Extensions.ServiceExtensions
             // create an HttpClient used for accessing the API
             services.AddHttpClient("MovieAPIClient", client =>
             {
-                client.BaseAddress = new Uri("https://localhost:5001/");
+                client.BaseAddress = new Uri("https://localhost:5010/"); //The url of the API Gateway
                 client.DefaultRequestHeaders.Clear();
                 client.DefaultRequestHeaders.Add(HeaderNames.Accept, "application/json");
             }).AddHttpMessageHandler<BearerTokenHandler>();
