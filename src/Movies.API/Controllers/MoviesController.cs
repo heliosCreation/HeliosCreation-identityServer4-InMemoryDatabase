@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Movies.API.Data;
 using Movies.API.Model;
+using Movies.API.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,24 +17,26 @@ namespace Movies.API.Controllers
     public class MoviesController : ControllerBase
     {
         private readonly MoviesContext _context;
+        private readonly ILoggedInUserService _user;
 
-        public MoviesController(MoviesContext context)
+        public MoviesController(MoviesContext context, ILoggedInUserService user)
         {
             _context = context;
+            _user = user;
         }
 
         // GET: api/Movies
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Movie>>> GetMovie()
         {
-            return await _context.Movie.ToListAsync();
+            return Ok( (await _context.Movie.ToListAsync()).Where(m => m.OwnerId == _user.getUserId()));
         }
 
         // GET: api/Movies/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Movie>> GetMovie(Guid id)
         {
-            var movie = await _context.Movie.FindAsync(id);
+            var movie = await _context.Movie.FirstOrDefaultAsync(m => m.Id == id &&  m.OwnerId == _user.getUserId());
 
             if (movie == null)
             {
@@ -49,7 +52,7 @@ namespace Movies.API.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutMovie(Guid id, Movie movie)
         {
-            if (id != movie.Id)
+            if (id != movie.Id || _user.getUserId() != movie.OwnerId)
             {
                 return BadRequest();
             }
@@ -91,7 +94,7 @@ namespace Movies.API.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult<Movie>> DeleteMovie(Guid id)
         {
-            var movie = await _context.Movie.FindAsync(id);
+            var movie = await _context.Movie.FirstOrDefaultAsync(m => m.Id == id && m.OwnerId == _user.getUserId());
             if (movie == null)
             {
                 return NotFound();

@@ -7,6 +7,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Movies.API.Data;
+using Movies.API.Services;
 
 namespace Movies.API
 {
@@ -22,7 +23,6 @@ namespace Movies.API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            AddSwagger(services);
             services.AddControllers();
 
             services.AddDbContext<MoviesContext>(options =>
@@ -42,6 +42,12 @@ namespace Movies.API
             {
                 option.AddPolicy("ClientIdPolicy", policy => policy.RequireClaim("client_id", "movie_api_client", "movies_mvc_client"));
             });
+            
+            services.AddHttpContextAccessor();
+
+            AddSwagger(services);
+
+            services.AddScoped<ILoggedInUserService, LoggedInUserService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
