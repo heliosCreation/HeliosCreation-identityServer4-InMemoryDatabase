@@ -1,10 +1,12 @@
-﻿using Movies.Client.Models;
+﻿using IdentityModel.Client;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Http;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+using Movies.Client.Models;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Json;
-using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 
@@ -13,13 +15,45 @@ namespace Movies.Client.ApiService
     public class MovieApiService : IMovieApiService
     {
         private readonly IHttpClientFactory _httpClientFactory;
+        private readonly HttpContext _httpContext;
         private readonly JsonSerializerOptions _options;
 
-        public MovieApiService(IHttpClientFactory httpClientFactory)
+        public MovieApiService(IHttpClientFactory httpClientFactory, IHttpContextAccessor httpContextAccessor)
         {
             _httpClientFactory = httpClientFactory ?? throw new ArgumentNullException(nameof(httpClientFactory));
+            _httpContext = httpContextAccessor.HttpContext;
             _options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
         }
+
+
+        public async Task<UserInfoViewModel> GetUserInfo()
+        {
+            var idpClient = _httpClientFactory.CreateClient("IDPClient");
+            var metaDataResponse = await idpClient.GetDiscoveryDocumentAsync();
+
+            if (metaDataResponse.IsError)
+            {
+                throw new HttpRequestException("Something went wrong when trying to get the discovery endpoint");
+            }
+
+            var accessToken = await _httpContext.GetTokenAsync(OpenIdConnectParameterNames.AccessToken);
+            var userInfo = await idpClient.GetUserInfoAsync(
+                new UserInfoRequest
+                {
+                    Address = metaDataResponse.UserInfoEndpoint,
+                    Token = accessToken
+                });
+
+            var userInfoDictionnary = new Dictionary<string, string>();
+            foreach (var claim in userInfo.Claims)
+            {
+                userInfoDictionnary.Add(claim.Type, claim.Value);
+            }
+
+            return new UserInfoViewModel(userInfoDictionnary);
+        }
+
+
 
         public async Task<IEnumerable<Movie>> GetMovies()
         {
@@ -63,7 +97,7 @@ namespace Movies.Client.ApiService
             {
                 Content = JsonContent.Create(movie)
             };
-            
+
             var response = await client.SendAsync(
                 request, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
 
